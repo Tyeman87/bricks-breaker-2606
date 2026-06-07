@@ -23,7 +23,7 @@ void Game::Reset()
 	bricks.clear(); // Clear vector before adding new ones
 
 	// Iterate 5 times to create 5 bricks
-	for auto (i = 0; i < 5; ++i)
+	for (int i = 0; i < 5; ++i)
 	{
 		Box newBrick;
 		newBrick.width = 10;
@@ -77,7 +77,10 @@ void Game::Render() const
 	ball.Draw();
 
 	// TODO #3 - Update render to render all bricks
-	brick.Draw();
+	for (const auto& brick : bricks)
+	{
+		brick.Draw();
+	}
 
 	Console::Lock(false);
 }
