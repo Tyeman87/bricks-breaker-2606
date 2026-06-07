@@ -82,6 +82,24 @@ void Game::Render() const
 		brick.Draw();
 	}
 
+	// Display Victory Text
+	if (bricks.empty())
+	{
+		Console::SetCursorPosition(20, 15);
+		Console::ForegroundColor(Yellow);
+		Console::WordWrap(20, 15, 40, "VICTORY!!! Press R to Reset!");
+		Console::ResetColor();
+	}
+
+	// Display Defeat Text
+	if (ball.y_position >= WINDOW_HEIGHT)
+	{
+		Console::SetCursorPosition(20, 15);
+		Console::ForegroundColor(Red);
+		Console::WordWrap(20, 15, 40, "DEFEAT!!! Press R to Reset!");
+		Console::ResetColor();
+	}
+
 	Console::Lock(false);
 }
 
@@ -90,30 +108,47 @@ void Game::CheckCollision()
 	// TODO #4 - Update collision to check all bricks
 	
 	// Iterate through bricks for collision check
-	for (auto& brick : bricks)
+	for (int i = 0; i < bricks.size(); ++i)
 	{
-		if (brick.Contains(ball.x_position + ball.x_velocity, ball.y_position + ball.y_velocity))
+		if (bricks[i].Contains(ball.x_position + ball.x_velocity, ball.y_position + ball.y_velocity))
 		{
-			brick.color = ConsoleColor(brick.color - 1);
+			bricks[i].color = ConsoleColor(bricks[i].color - 1);
 			ball.y_velocity *= -1;
 
 		// TODO #5 - If the ball hits the same brick 3 times (color == black), remove it from the vector
 			
 			// Black Color Check for brick removal
-			if (brick.color == ConsoleColor::Black)
+			if (bricks[i].color == ConsoleColor::Black)
 			{
-				bricks.erase(std::remove(bricks.begin(), bricks.end(), brick), bricks.end());
+				bricks.erase(bricks.begin() + i);
 			}
+
+			break; // Exit collision loop
 		}
 	}
 
 	// TODO #6 - If no bricks remain, pause ball and display (render) victory text with R to reset
 
-
-	if (paddle.Contains(ball.x_position + ball.x_velocity, ball.y_velocity + ball.y_position))
+	// Check for victory condition (no bricks left)
+	if (bricks.empty())
 	{
-		ball.y_velocity *= -1;
+		// Pause the ball
+		ball.moving = false;
 	}
 
+	// Paddle collision check
+	if (paddle.Contains(ball.x_position + ball.x_velocity, ball.y_velocity + ball.y_position))
+	{
+		ball.y_velocity *= -1;	
+	}
+	
+
 	// TODO #7 - If ball touches bottom of window, pause ball and display (render) defeat text with R to reset
+
+	// Check for defeat condition (ball touches bottom)
+	if (ball.y_position + ball.y_velocity >= WINDOW_HEIGHT)
+	{
+		// Pause the ball
+		ball.moving = false;
+	}
 }
